@@ -7,12 +7,215 @@ const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
+
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+
 app.get("/", async (req, res) => {
     try {
-        const students = await prisma.student.findMany()
-        res.send(students);
+        const students = await prisma.student.findMany();
+        return res.send(students);
     } catch (error) {
-        console.log(error.message)
+        return res.status(500).send({
+            error: true,
+            message: error.message
+        })
+    } finally {
+        await prisma.$disconnect();
+    }
+})
+
+app.post("/", async (req, res) => {
+    const { name, nim, email, telp } = req.body;
+    if(!name || !nim || !email || !telp){
+        return res.status(400).send({
+            error: true,
+            message: "Ada data yang belum diisi"
+        })
+    }
+
+    try {
+        const studentIsExist = await prisma.student.findUnique({
+            where: {
+                nim: nim
+            }
+        })
+
+        if(studentIsExist){
+            return res.status(400).send({
+                error: true,
+                message: "Mahasiswa sudah pernah ditambahkan"
+            })
+        }
+
+        const emailIsExist = await prisma.student.findUnique({
+            where: {
+                email: email
+            }
+        })
+
+        const telpIsExist = await prisma.student.findUnique({
+            where: {
+                telp: telp
+            }
+        })
+
+        if(emailIsExist || telpIsExist){
+            return res.status(400).send({
+                error: true,
+                message: "Email atau no telepon sudah digunakan"
+            })
+        }
+
+        const newStudent = await prisma.student.create({
+            data: {
+                name: name,
+                nim: nim,
+                email: email,
+                telp: telp
+            }
+        })
+        return res.status(201).send({
+            error: false,
+            message: "Mahasiswa berhasil ditambahkan",
+            result: newStudent
+        })
+    } catch (error) {
+        return res.status(500).send({
+            error: true,
+            message: error.message
+        })
+    } finally {
+        await prisma.$disconnect();
+    }
+})
+
+app.get("/:id", async (req, res) => {
+    const studentId = parseInt(req.params.id);
+    try {
+        const student = await prisma.student.findUnique({
+            where: {
+                id: studentId
+            }
+        })
+        if(!student){
+            return res.status(404).send({
+                error: true,
+                message: "Mahasiswa tidak ditemukan"
+            })
+        }
+        return res.status(200).send(student);
+    } catch (error) {
+        return res.status(500).send({
+            error: true,
+            message: error.message
+        })
+    } finally {
+        await prisma.$disconnect();
+    }
+})
+
+app.put("/:id", async (req, res) => {
+    const studentId = parseInt(req.params.id);
+    const { email, telp } = req.body;
+    if (!email || !telp) {
+        return res.status(400).send({
+          error: "true",
+          message: "Ada field yang kosong",
+        });
+      }
+
+    try {
+        const student = await prisma.student.findUnique({
+            where: {
+                id: studentId
+            }
+        })
+        if(!student){
+            return res.status(404).send({
+                error: true,
+                message: "Mahasiswa tidak ditemukan"
+            })
+        }
+
+        const emailIsExist = await prisma.student.findMany({
+            where: {
+                email: email,
+                NOT: {
+                    id: studentId 
+                }
+            }
+        });
+
+        const telpIsExist = await prisma.student.findMany({
+            where: {
+                telp: telp,
+                NOT: {
+                    id: studentId 
+                }
+            }
+        });
+
+        if(emailIsExist.length > 0 || telpIsExist.length > 0){
+            return res.status(400).send({
+                error: true,
+                message: "Email atau no telepon sudah digunakan"
+            })
+        }
+
+        await prisma.student.update({
+            where: {
+                id: studentId
+            },
+            data: {
+                email: email,
+                telp: telp
+            }
+        })
+        return res.status(200).send({
+            error: false,
+            message: "Email/No telp berhasil diubah"
+        })
+    } catch (error) {
+        return res.status(500).send({
+            error: true,
+            message: error.message
+        })
+    } finally {
+        await prisma.$disconnect();
+    }
+})
+
+app.delete("/:id", async (req, res) => {
+    const studentId = parseInt(req.params.id);
+    try {
+        const student = await prisma.student.findUnique({
+            where: {
+                id: studentId
+            }
+        })
+        if(!student){
+            return res.status(404).send({
+                error: true,
+                message: "Mahasiswa tidak ditemukan"
+            })
+        }
+
+        await prisma.student.delete({
+            where: {
+                id: studentId
+            }
+        })
+
+        return res.status(200).send({
+            error: false,
+            message: "Data Mahasiswa berhasil dihapus" 
+        });
+    } catch (error) {
+        return res.status(500).send({
+            error: true,
+            message: error.message
+        })
     } finally {
         await prisma.$disconnect();
     }

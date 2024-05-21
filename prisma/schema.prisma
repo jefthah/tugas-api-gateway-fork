@@ -16,7 +16,9 @@ datasource db {
 model Student {
   id    Int     @id @default(autoincrement())
   nim String  @unique
-  name  String?
+  name  String
+  email String @unique
+  telp String @unique
   subjects Subject[]
 }
 

@@ -9,7 +9,7 @@ app.use("/students", createProxyMiddleware({
     pathRewrite: {
         '^/students': ''
     }
-}))
+}));
 
 // http://localhost:3000/subjects => http://localhost:3002/
 app.use("/subjects", createProxyMiddleware({
@@ -17,8 +17,8 @@ app.use("/subjects", createProxyMiddleware({
     pathRewrite: {
         '^/subjects': ''
     }
-}))
+}));
 
 app.listen(port, () => {
     console.log(`API Gateway service listening on port ${port}`);
-})
+});

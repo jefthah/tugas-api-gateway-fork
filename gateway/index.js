@@ -2,7 +2,9 @@ const express = require("express");
 const { createProxyMiddleware } = require("http-proxy-middleware"); 
 const app = express();
 const port = 3000;
+const cors = require("cors");
 
+app.use(cors());
 // http://localhost:3000/students => http://localhost:3001/
 app.use("/students", createProxyMiddleware({
     target: `http://localhost:3001`,

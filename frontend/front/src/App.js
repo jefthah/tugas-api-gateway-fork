@@ -10,6 +10,7 @@ function App() {
       <div>
         <Navbar />
         <Routes>
+          <Route path="/" element={<Navigate to="/student" />} />
           <Route path="/student" element={<Student />} />
           <Route path="/subject" element={<Subject />} />
         </Routes>

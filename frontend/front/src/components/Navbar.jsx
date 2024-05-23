@@ -9,10 +9,10 @@ function Navbar() {
           <a href="/student" className="navbar-link">Student</a>
         </li>
         <li className="navbar-item">
-          <a href="/subjek" className="navbar-link">Subjek</a>
+          <a href="/subject" className="navbar-link">Subjek</a>
         </li>
-        <li className="navbar-title">
-          Judul navbar Tugas Pak Panji
+        <li className="navbar-title navbar-item">
+          Tugas Pak Panji
         </li>
       </ul>
     </nav>

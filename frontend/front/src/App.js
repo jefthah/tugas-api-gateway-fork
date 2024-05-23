@@ -1,13 +1,20 @@
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Student from './components/Student';
 import Navbar from './components/Navbar';
-
+import Subject from './components/Subject';
 
 function App() {
   return (
-    <div >
-      <Navbar />
-      <Student />
-    </div>
+    <Router>
+      <div>
+        <Navbar />
+        <Routes>
+          <Route path="/student" element={<Student />} />
+          <Route path="/subject" element={<Subject />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
